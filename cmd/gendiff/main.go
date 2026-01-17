@@ -1,6 +1,7 @@
 package main
 
 import (
+	"code/internal/parser"
 	"context"
 	"fmt"
 	"log"
@@ -35,6 +36,16 @@ func main() {
 			data2, err := os.ReadFile(file2)
 			if err != nil {
 				log.Fatal(err)
+			}
+
+			parsedData1, err := parser.ParseJson(string(data1))
+			if err != nil {
+				return fmt.Errorf("error parsing %s: %w", file1, err)
+			}
+
+			parsedData2, err := parser.ParseJson(string(data2))
+			if err != nil {
+				return fmt.Errorf("error parsing %s: %w", file2, err)
 			}
 
 			fmt.Printf("Comparing %s and %s\n", data1, data2)
