@@ -21,8 +21,20 @@ func main() {
 				Value:   "stylish",
 			},
 		},
-		Action: func(context.Context, *cli.Command) error {
-			fmt.Println("boom! I say!")
+		Action: func(ctx context.Context, cmd *cli.Command) error {
+			file1 := cmd.Args().Get(0)
+			file2 := cmd.Args().Get(1)
+			data1, err := os.ReadFile(file1)
+			if err != nil {
+				log.Fatal(err)
+			}
+			data2, err := os.ReadFile(file2)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			fmt.Printf("Comparing %s and %s\n", data1, data2)
+
 			return nil
 		},
 	}
