@@ -1,5 +1,7 @@
 package diff
 
+import "sort"
+
 type ChangeType string
 
 const (
@@ -47,6 +49,10 @@ func GenerateDiff(data1, data2 map[string]interface{}) []Diff {
 			AddRemoved(&result, key, value1)
 		}
 	}
+
+	sort.Slice(result, func(a, b int) bool {
+		return result[a].Key < result[b].Key
+	})
 
 	return result
 }
