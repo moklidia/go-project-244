@@ -1,6 +1,8 @@
 package main
 
 import (
+	"code/internal/diff"
+	"code/internal/formatter"
 	"code/internal/parser"
 	"context"
 	"fmt"
@@ -48,7 +50,11 @@ func main() {
 				return fmt.Errorf("error parsing %s: %w", file2, err)
 			}
 
-			fmt.Printf("Comparing %s and %s\n", data1, data2)
+			diffData := diff.GenerateDiff(parsedData1, parsedData2)
+
+			formattedDiff := formatter.Format(diffData)
+
+			fmt.Println(formattedDiff)
 
 			return nil
 		},
