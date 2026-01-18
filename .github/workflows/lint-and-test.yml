@@ -17,8 +17,8 @@ jobs:
         with:
           go-version: '1.25.4'
       - name: Lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: v1.64.2
+          version: latest
       - name: Test
         run: make test
