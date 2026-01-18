@@ -8,8 +8,8 @@ import (
 )
 
 func TestRun(t *testing.T) {
-	file1 := filepath.Join("..", "..", "testdata/file1.json")
-	file2 := filepath.Join("..", "..", "testdata/file2.json")
+	file1 := filepath.Join("..", "..", "testdata/fixtures/file1.json")
+	file2 := filepath.Join("..", "..", "testdata/fixtures/file2.json")
 
 	want := `{
   - follow: false
