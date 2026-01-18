@@ -31,30 +31,13 @@ func main() {
 			}
 			file1 := cmd.Args().Get(0)
 			file2 := cmd.Args().Get(1)
-			data1, err := os.ReadFile(file1)
+			format := cmd.String("format")
+			result, err := run(file1, file2, format)
 			if err != nil {
 				log.Fatal(err)
 			}
-			data2, err := os.ReadFile(file2)
-			if err != nil {
-				log.Fatal(err)
-			}
 
-			parsedData1, err := parser.ParseJson(string(data1))
-			if err != nil {
-				return fmt.Errorf("error parsing %s: %w", file1, err)
-			}
-
-			parsedData2, err := parser.ParseJson(string(data2))
-			if err != nil {
-				return fmt.Errorf("error parsing %s: %w", file2, err)
-			}
-
-			diffData := diff.GenerateDiff(parsedData1, parsedData2)
-
-			formattedDiff := formatter.Format(diffData)
-
-			fmt.Println(formattedDiff)
+			fmt.Println(result)
 
 			return nil
 		},
@@ -63,4 +46,31 @@ func main() {
 	if err := cmd.Run(context.Background(), os.Args); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func run(file1, file2, format string) (string, error) {
+	data1, err := os.ReadFile(file1)
+	if err != nil {
+		return "", err
+	}
+	data2, err := os.ReadFile(file2)
+	if err != nil {
+		return "", err
+	}
+
+	parsedData1, err := parser.ParseJson(string(data1))
+	if err != nil {
+		return "", fmt.Errorf("error parsing %s: %w", file1, err)
+	}
+
+	parsedData2, err := parser.ParseJson(string(data2))
+	if err != nil {
+		return "", fmt.Errorf("error parsing %s: %w", file2, err)
+	}
+
+	diffData := diff.GenerateDiff(parsedData1, parsedData2)
+
+	formattedDiff := formatter.Format(diffData, format)
+
+	return formattedDiff, nil
 }

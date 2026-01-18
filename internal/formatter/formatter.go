@@ -10,7 +10,7 @@ const (
 	indentSize = 2
 )
 
-func Format(data []diff.Diff) string {
+func Format(data []diff.Diff, _format string) string {
 	lines := convert(data, 1)
 
 	result := strings.Join(lines, "\n")

@@ -25,7 +25,7 @@ func TestFormat(t *testing.T) {
   + verbose: true
 }`
 
-	got := Format(data)
+	got := Format(data, "stylish")
 
 	assert.Equal(t, want, got)
 }
