@@ -57,13 +57,12 @@ func run(file1, file2, format string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	parsedData1, err := parser.ParseJson(string(data1))
+	parsedData1, err := parser.Parse(string(data1))
 	if err != nil {
 		return "", fmt.Errorf("error parsing %s: %w", file1, err)
 	}
 
-	parsedData2, err := parser.ParseJson(string(data2))
+	parsedData2, err := parser.Parse(string(data2))
 	if err != nil {
 		return "", fmt.Errorf("error parsing %s: %w", file2, err)
 	}
