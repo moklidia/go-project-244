@@ -38,11 +38,25 @@ func GenerateDiff(data1, data2 map[string]interface{}, diff *[]Diff) []Diff {
 		value1, ok1 := data1[key]
 		value2, ok2 := data2[key]
 		if !ok1 {
-			addAdded(diff, key, value2)
+			if isNested(value2) {
+				map2 := value2.(map[string]interface{})
+				var children []Diff
+				GenerateDiff(map[string]interface{}{}, map2, &children)
+				*diff = append(*diff, Diff{Type: Added, Key: key, Children: children})
+			} else {
+				addAdded(diff, key, value2)
+			}
 			continue
 		}
 		if !ok2 {
-			addRemoved(diff, key, value1)
+			if isNested(value1) {
+				map1 := value1.(map[string]interface{})
+				var children []Diff
+				GenerateDiff(map1, map[string]interface{}{}, &children)
+				*diff = append(*diff, Diff{Type: Removed, Key: key, Children: children})
+			} else {
+				addRemoved(diff, key, value1)
+			}
 			continue
 		}
 		if isNested(value1) && isNested(value2) {
