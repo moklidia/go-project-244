@@ -29,3 +29,32 @@ func TestFormat(t *testing.T) {
 
 	assert.Equal(t, want, got)
 }
+
+func TestFormatNested(t *testing.T) {
+	// Данные как возвращает GenerateDiff (дерево с Parent и Children)
+	data := []diff.Diff{
+		{Type: diff.Unchanged, Key: "host", Value: "hexlet.io"},
+		{
+			Type:  diff.Parent,
+			Key:   "common",
+			Children: []diff.Diff{
+				{Type: diff.Unchanged, Key: "setting1", Value: "Value 1"},
+				{Type: diff.Removed, Key: "setting2", Value: 200},
+				{Type: diff.Added, Key: "setting3", Value: true},
+			},
+		},
+	}
+
+	want := `{
+    host: hexlet.io
+  common: {
+      setting1: Value 1
+    - setting2: 200
+    + setting3: true
+  }
+}`
+
+	got := Format(data, "stylish")
+
+	assert.Equal(t, want, got)
+}

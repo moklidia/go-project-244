@@ -22,6 +22,11 @@ func convert(data []diff.Diff, depth int) []string {
 
 	for _, item := range data {
 		switch item.Type {
+		case diff.Parent:
+			indent := generateIndent(depth)
+			lines = append(lines, fmt.Sprintf("%s%s: {", indent, item.Key))
+			lines = append(lines, convert(item.Children, depth+1)...)
+			lines = append(lines, fmt.Sprintf("%s}", indent))
 		case diff.Added:
 			newLine := formatLine("+", item.Key, item.Value, depth)
 			lines = append(lines, newLine)

@@ -57,9 +57,16 @@ func TestGenerateNestedDiff(t *testing.T) {
 
 	want := []Diff{
 		{Type: Unchanged, Key: "host", Value: "hexlet.io"},
-		{Type: Unchanged, Key: "common.setting1", Value: "Value 1"},
-		{Type: Removed, Key: "common.setting2", Value: 200},
-		{Type: Added, Key: "common.setting3", Value: true},
+		{
+			Type:     Parent,
+			Key:      "common",
+			Value:    nil,
+			Children: []Diff{
+				{Type: Unchanged, Key: "setting1", Value: "Value 1"},
+				{Type: Removed, Key: "setting2", Value: 200},
+				{Type: Added, Key: "setting3", Value: true},
+			},
+		},
 	}
 
 	assert.ElementsMatch(t, want, got)
