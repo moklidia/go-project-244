@@ -67,7 +67,9 @@ func run(file1, file2, format string) (string, error) {
 		return "", fmt.Errorf("error parsing %s: %w", file2, err)
 	}
 
-	diffData := diff.GenerateDiff(parsedData1, parsedData2)
+	var diffData []diff.Diff
+
+	diffData = diff.GenerateDiff(parsedData1, parsedData2, &diffData)
 
 	formattedDiff := formatter.Format(diffData, format)
 
