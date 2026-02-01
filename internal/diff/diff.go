@@ -20,6 +20,7 @@ type Diff struct {
 	Value    interface{}
 	OldValue interface{}
 	NewValue interface{}
+	ParentKey string
 	Children []Diff
 }
 
@@ -42,7 +43,7 @@ func GenerateDiff(data1, data2 map[string]interface{}, diff *[]Diff) []Diff {
 				map2 := value2.(map[string]interface{})
 				var children []Diff
 				GenerateDiff(map[string]interface{}{}, map2, &children)
-				*diff = append(*diff, Diff{Type: Added, Key: key, Children: children})
+				*diff = append(*diff, Diff{Type: Added, Key: key, Children: children })
 			} else {
 				addAdded(diff, key, value2)
 			}
