@@ -3,6 +3,7 @@ package main
 import (
 	"path/filepath"
 	"testing"
+	"code"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -20,7 +21,7 @@ func TestRunJson(t *testing.T) {
   + verbose: true
 }`
 
-	got, err := run(file1, file2, "stylish")
+	got, err := code.GenDiff(file1, file2, "stylish")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -41,7 +42,7 @@ func TestRunYml(t *testing.T) {
   + verbose: true
 }`
 
-	got, err := run(file1, file2, "stylish")
+	got, err := code.GenDiff(file1, file2, "stylish")
 	if err != nil {
 		t.Fatal(err)
 	}
