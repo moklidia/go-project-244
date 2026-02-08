@@ -20,7 +20,7 @@ func Format(data []diff.Diff, format string) string {
 		lines := formatPlain(data, "")
 		result = strings.Join(lines, "\n")
 	case "json":
-		result = "[]"
+		result = formatJson(data)
 	}
 
 	return result
