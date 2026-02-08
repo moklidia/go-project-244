@@ -1,7 +1,7 @@
 package formatter
 
 import (
-	"encoding/json"
+	// "encoding/json"
 	"code/internal/diff"
 )
 
