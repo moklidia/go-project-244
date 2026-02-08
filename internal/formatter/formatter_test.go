@@ -46,15 +46,38 @@ func TestFormatNested(t *testing.T) {
 
 	want := `{
     host: hexlet.io
-  common: {
-      setting1: Value 1
-    - setting2: 200
-    + setting3: true
-  }
+    common: {
+        setting1: Value 1
+      - setting2: 200
+      + setting3: true
+    }
 }`
 
 	got := Format(data, "stylish")
 
+	assert.Equal(t, want, got)
+}
+
+func TestFormatNestedAdded(t *testing.T) {
+	data := []diff.Diff{
+		{
+			Type: diff.Added,
+			Key:  "group3",
+			Children: []diff.Diff{
+				{Type: diff.Added, Key: "fee", Value: 100500},
+				{Type: diff.Added, Key: "nested", Value: "value"},
+			},
+		},
+	}
+
+	want := `{
+  + group3: {
+        fee: 100500
+        nested: value
+    }
+}`
+
+	got := Format(data, "stylish")
 	assert.Equal(t, want, got)
 }
 

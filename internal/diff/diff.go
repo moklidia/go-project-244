@@ -20,7 +20,6 @@ type Diff struct {
 	Value    interface{}
 	OldValue interface{}
 	NewValue interface{}
-	ParentKey string
 	Children []Diff
 }
 

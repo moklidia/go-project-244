@@ -7,18 +7,20 @@ import (
 )
 
 const (
-	indentSize = 2
+	indentSize = 4
 )
 
 func Format(data []diff.Diff, format string) string {
 	var result string
 	switch format {
 	case "stylish":
-	  lines := formatStylish(data, 1)
+	  lines := formatStylish(data, 0)
 		result = fmt.Sprintf("{\n%s\n}", strings.Join(lines, "\n"))
 	case "plain":
 		lines := formatPlain(data, "")
 		result = strings.Join(lines, "\n")
+	case "json":
+		result = "Not implemented"
 	}
 
 	return result
@@ -53,38 +55,36 @@ func formatPlain(data []diff.Diff, prefix string) []string {
 
 func formatStylish(data []diff.Diff, depth int) []string {
 	var lines []string
+	baseIndent := strings.Repeat(" ", indentSize*depth)
 
 	for _, item := range data {
 		switch item.Type {
 		case diff.Parent:
-			indent := generateIndent(depth)
-			lines = append(lines, fmt.Sprintf("%s%s: {", indent, item.Key))
+			lines = append(lines, fmt.Sprintf("    %s%s: {", baseIndent, item.Key))
 			lines = append(lines, formatStylish(item.Children, depth+1)...)
-			lines = append(lines, fmt.Sprintf("%s}", indent))
+			lines = append(lines, fmt.Sprintf("    %s}", baseIndent))
 		case diff.Added:
 			if len(item.Children) > 0 {
-				indent := generateIndent(depth)
-				lines = append(lines, fmt.Sprintf("%s+ %s: {", indent, item.Key))
-				lines = append(lines, formatStylish(item.Children, depth+1)...)
-				lines = append(lines, fmt.Sprintf("%s}", indent))
+				lines = append(lines, fmt.Sprintf("  %s+ %s: {", baseIndent, item.Key))
+				lines = append(lines, formatStylishValueOnly(item.Children, depth+1)...)
+				lines = append(lines, fmt.Sprintf("    %s}", baseIndent))
 			} else {
-				lines = append(lines, formatStylishLine("+", item.Key, item.Value, depth))
+				lines = append(lines, formatStylishLine("+", item.Key, item.Value, baseIndent))
 			}
 		case diff.Removed:
 			if len(item.Children) > 0 {
-				indent := generateIndent(depth)
-				lines = append(lines, fmt.Sprintf("%s- %s: {", indent, item.Key))
-				lines = append(lines, formatStylish(item.Children, depth+1)...)
-				lines = append(lines, fmt.Sprintf("%s}", indent))
+				lines = append(lines, fmt.Sprintf("  %s- %s: {", baseIndent, item.Key))
+				lines = append(lines, formatStylishValueOnly(item.Children, depth+1)...)
+				lines = append(lines, fmt.Sprintf("    %s}", baseIndent))
 			} else {
-				lines = append(lines, formatStylishLine("-", item.Key, item.Value, depth))
+				lines = append(lines, formatStylishLine("-", item.Key, item.Value, baseIndent))
 			}
 		case diff.Unchanged:
-			newLine := formatStylishLine(" ", item.Key, item.Value, depth)
+			newLine := formatStylishLine(" ", item.Key, item.Value, baseIndent)
 			lines = append(lines, newLine)
 		case diff.Changed:
-			oldLine := formatStylishLine("-", item.Key, item.OldValue, depth)
-			newLine := formatStylishLine("+", item.Key, item.NewValue, depth)
+			oldLine := formatStylishLine("-", item.Key, item.OldValue, baseIndent)
+			newLine := formatStylishLine("+", item.Key, item.NewValue, baseIndent)
 			lines = append(lines, oldLine)
 			lines = append(lines, newLine)
 		}
@@ -93,9 +93,24 @@ func formatStylish(data []diff.Diff, depth int) []string {
 	return lines
 }
 
-func formatStylishLine(prefix, key string, value interface{}, depth int) string {
-	indent := generateIndent(depth)
-	return fmt.Sprintf("%s%s %s: %s", indent, prefix, key, formatValue(value))
+func formatStylishLine(prefix, key string, value interface{}, indent string) string {
+	return fmt.Sprintf("  %s%s %s: %s", indent, prefix, key, formatValue(value))
+}
+
+func formatStylishValueOnly(data []diff.Diff, depth int) []string {
+	var lines []string
+	keyIndent := strings.Repeat(" ", indentSize*(depth+1))
+
+	for _, item := range data {
+		if len(item.Children) > 0 {
+			lines = append(lines, fmt.Sprintf("%s%s: {", keyIndent, item.Key))
+			lines = append(lines, formatStylishValueOnly(item.Children, depth+1)...)
+			lines = append(lines, fmt.Sprintf("%s}", keyIndent))
+		} else {
+			lines = append(lines, fmt.Sprintf("%s%s: %s", keyIndent, item.Key, formatValue(item.Value)))
+		}
+	}
+	return lines
 }
 
 func formatValue(v interface{}) string {
