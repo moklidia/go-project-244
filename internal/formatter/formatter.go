@@ -3,6 +3,7 @@ package formatter
 import (
 	"code/internal/diff"
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -20,7 +21,7 @@ func Format(data []diff.Diff, format string) string {
 		lines := formatPlain(data, "")
 		result = strings.Join(lines, "\n")
 	case "json":
-		result = "Not implemented"
+		result = "[]"
 	}
 
 	return result
@@ -82,11 +83,11 @@ func formatStylish(data []diff.Diff, depth int) []string {
 		case diff.Unchanged:
 			newLine := formatStylishLine(" ", item.Key, item.Value, baseIndent)
 			lines = append(lines, newLine)
-		case diff.Changed:
-			oldLine := formatStylishLine("-", item.Key, item.OldValue, baseIndent)
-			newLine := formatStylishLine("+", item.Key, item.NewValue, baseIndent)
-			lines = append(lines, oldLine)
-			lines = append(lines, newLine)
+	case diff.Changed:
+		oldValue := formatValueToStylish(item.OldValue, depth)
+		newValue := formatValueToStylish(item.NewValue, depth)
+		lines = append(lines, fmt.Sprintf("  %s- %s: %s", baseIndent, item.Key, oldValue))
+		lines = append(lines, fmt.Sprintf("  %s+ %s: %s", baseIndent, item.Key, newValue))
 		}
 	}
 
@@ -124,6 +125,35 @@ func formatValue(v interface{}) string {
 	return fmt.Sprintf("%v", v)
 }
 
+func formatValueToStylish(value interface{}, depth int) string {
+	if value == nil {
+		return "null"
+	}
+	if m, ok := value.(map[string]interface{}); ok {
+		return mapToStylish(m, depth)
+	}
+	return fmt.Sprintf("%v", value)
+}
+
+func mapToStylish(m map[string]interface{}, depth int) string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	
+	keyIndent := strings.Repeat(" ", indentSize*(depth+2))
+	closeIndent := strings.Repeat(" ", indentSize*(depth+1))
+	
+	var lines []string
+	for _, k := range keys {
+		v := m[k]
+		lines = append(lines, fmt.Sprintf("%s%s: %s", keyIndent, k, formatValueToStylish(v, depth+1)))
+	}
+	result := strings.Join(lines, "\n")
+	return fmt.Sprintf("{\n%s\n%s}", result, closeIndent)
+}
+
 func formatPlainValue(v interface{}) string {
 	if v == nil {
 		return "null"
@@ -136,9 +166,3 @@ func formatPlainValue(v interface{}) string {
 	}
 	return fmt.Sprintf("%v", v)
 }
-
-func generateIndent(depth int) string {
-	spaces := depth * indentSize
-	return strings.Repeat(" ", spaces)
-}
-
